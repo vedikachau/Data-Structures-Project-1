@@ -95,7 +95,20 @@ public class MainGUI extends JFrame {
         idField.requestFocus();
     }
 
-    // the action of the Add Session button
+    public static boolean comesBefore(String date1, String date2){
+        if(Integer.parseInt(date1.substring(0,4)) != Integer.parseInt(date2.substring(0,4))){
+            return Integer.parseInt(date1.substring(0,4)) < Integer.parseInt(date2.substring(0,4));
+        }
+        if(Integer.parseInt(date1.substring(5,7)) != Integer.parseInt(date2.substring(5,7))){
+            return Integer.parseInt(date1.substring(5,7)) < Integer.parseInt(date2.substring(5,7));
+        }
+        return Integer.parseInt(date1.substring(8)) <= Integer.parseInt(date1.substring(8));
+    }
+
+
+
+
+        // the action of the Add Session button
     private void addSession() {
         try {
             int id = Integer.parseInt(idField.getText());
@@ -107,6 +120,13 @@ public class MainGUI extends JFrame {
 
             // TO DO: construct a session object, insert it into
             // the list of sessions
+            record Session(int id, String title, String mentor, String date, String location, int maxNum) {};
+            record SessionList(Session first, SessionList rest) {};
+
+            Session s1 = new Session(id, title, mentor, date, location, maxParticipants);
+            while()
+                //need to add in correct spot
+            };
 
             outputArea.setText("Session Added Successfully\n");
             // Clear the input fields
