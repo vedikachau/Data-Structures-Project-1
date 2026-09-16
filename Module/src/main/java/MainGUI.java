@@ -13,14 +13,14 @@ public class MainGUI extends JFrame {
 
     // there should be a private member variable named `sessions` :
     record Session(int id, String title, String mentor, String date, String location, int maxNum) {};
+    record SessionList(Session first, SessionList rest) {};
+    SessionList sessions = new SessionList(null, null);
     // private SomethingOrOther sessions;
 
     // the constructor for the class. This will initialize
     // the class's member variables:
     public MainGUI() {
         // set sessions to a new empty list:
-        record SessionList(Session first, SessionList rest) {};
-        SessionList sessions = new SessionList(null, null);
         //SessionList sessions = new SessionList()
         setTitle("Employee Mentorship and Inclusion Manager");
         setSize(600, 600);
@@ -31,14 +31,6 @@ public class MainGUI extends JFrame {
         setVisible(true);
     }
 
-    public static SessionList addToEnd(SessionList d, dateRecord end){
-        return switch(d){
-            case null -> new Date(end, null);
-            case Date(dateRecord f, Date r) ->
-                    new Date(f, addToEnd(r, end));
-
-        };
-    }
 
     // Create all of the display elements in the frame:
     private void createGUI() {
@@ -108,7 +100,7 @@ public class MainGUI extends JFrame {
     }
 
 
-    /*public static boolean comesBefore(String date1, String date2){
+    public static boolean comesBefore(String date1, String date2){
         if(Integer.parseInt(date1.substring(0,4)) != Integer.parseInt(date2.substring(0,4))){
             return Integer.parseInt(date1.substring(0,4)) < Integer.parseInt(date2.substring(0,4));
         }
@@ -116,10 +108,33 @@ public class MainGUI extends JFrame {
             return Integer.parseInt(date1.substring(5,7)) < Integer.parseInt(date2.substring(5,7));
         }
         return Integer.parseInt(date1.substring(8)) <= Integer.parseInt(date1.substring(8));
-    }*/
+    }
+
+    public static SessionList addToEnd(SessionList s1, Session end){
+        return switch(s1){
+            case null -> new SessionList(end, null);
+            case SessionList(Session f, SessionList r) ->
+                    new SessionList(f, addToEnd(r, end));
+
+        };
+    }
+
+    //need to figure out how to create new list
+    public static SessionList addInOrder(Session s, SessionList s1){
+        return switch(s1){
+            case null -> addToEnd(s1, s);
+            case SessionList(Session f, SessionList r) -> {
+                if(comesBefore(s1.first.date, s.date)){
+                    new SessionList(s1.first, addInOrder(s, s1.rest));
+                }
+                else{
+                    addToFront();
+                }}
+        };
+    }
 
 
-        // the action of the Add Session button
+    // the action of the Add Session button
     private void addSession() {
         try {
             int id = Integer.parseInt(idField.getText());
@@ -135,6 +150,7 @@ public class MainGUI extends JFrame {
 
             Session s1 = new Session(id, title, mentor, date, location, maxParticipants);
             //need to add in correct spot
+            addInOrder(s1, sessions);
 
 
             outputArea.setText("Session Added Successfully\n");
