@@ -12,13 +12,16 @@ public class MainGUI extends JFrame {
     private JTextArea outputArea;
 
     // there should be a private member variable named `sessions` :
+    record Session(int id, String title, String mentor, String date, String location, int maxNum) {};
     // private SomethingOrOther sessions;
 
     // the constructor for the class. This will initialize
     // the class's member variables:
     public MainGUI() {
         // set sessions to a new empty list:
-        // sessions = ...
+        record SessionList(Session first, SessionList rest) {};
+        SessionList sessions = new SessionList(null, null);
+        //SessionList sessions = new SessionList()
         setTitle("Employee Mentorship and Inclusion Manager");
         setSize(600, 600);
         // when this frame/window closes, halt the whole program:
@@ -26,6 +29,15 @@ public class MainGUI extends JFrame {
         setLocationRelativeTo(null);
         createGUI();
         setVisible(true);
+    }
+
+    public static SessionList addToEnd(SessionList d, dateRecord end){
+        return switch(d){
+            case null -> new Date(end, null);
+            case Date(dateRecord f, Date r) ->
+                    new Date(f, addToEnd(r, end));
+
+        };
     }
 
     // Create all of the display elements in the frame:
@@ -95,7 +107,8 @@ public class MainGUI extends JFrame {
         idField.requestFocus();
     }
 
-    public static boolean comesBefore(String date1, String date2){
+
+    /*public static boolean comesBefore(String date1, String date2){
         if(Integer.parseInt(date1.substring(0,4)) != Integer.parseInt(date2.substring(0,4))){
             return Integer.parseInt(date1.substring(0,4)) < Integer.parseInt(date2.substring(0,4));
         }
@@ -103,9 +116,7 @@ public class MainGUI extends JFrame {
             return Integer.parseInt(date1.substring(5,7)) < Integer.parseInt(date2.substring(5,7));
         }
         return Integer.parseInt(date1.substring(8)) <= Integer.parseInt(date1.substring(8));
-    }
-
-
+    }*/
 
 
         // the action of the Add Session button
@@ -120,13 +131,11 @@ public class MainGUI extends JFrame {
 
             // TO DO: construct a session object, insert it into
             // the list of sessions
-            record Session(int id, String title, String mentor, String date, String location, int maxNum) {};
-            record SessionList(Session first, SessionList rest) {};
+            //record SessionList(Session first, SessionList rest) {};
 
             Session s1 = new Session(id, title, mentor, date, location, maxParticipants);
-            while()
-                //need to add in correct spot
-            };
+            //need to add in correct spot
+
 
             outputArea.setText("Session Added Successfully\n");
             // Clear the input fields
