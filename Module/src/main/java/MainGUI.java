@@ -14,13 +14,14 @@ public class MainGUI extends JFrame {
     // there should be a private member variable named `sessions` :
     record Session(int id, String title, String mentor, String date, String location, int maxNum) {};
     record SessionList(Session first, SessionList rest) {};
-    SessionList sessions = new SessionList(null, null);
-    // private SomethingOrOther sessions;
+    //SessionList sessions = new SessionList(null, null);
+    private SessionList sessions;
 
     // the constructor for the class. This will initialize
     // the class's member variables:
     public MainGUI() {
         // set sessions to a new empty list:
+        sessions = null;
         //SessionList sessions = new SessionList()
         setTitle("Employee Mentorship and Inclusion Manager");
         setSize(600, 600);
@@ -107,7 +108,7 @@ public class MainGUI extends JFrame {
         if(Integer.parseInt(date1.substring(5,7)) != Integer.parseInt(date2.substring(5,7))){
             return Integer.parseInt(date1.substring(5,7)) < Integer.parseInt(date2.substring(5,7));
         }
-        return Integer.parseInt(date1.substring(8)) <= Integer.parseInt(date1.substring(8));
+        return Integer.parseInt(date1.substring(8)) <= Integer.parseInt(date2.substring(8));
     }
 
     public static SessionList addToEnd(SessionList s1, Session end){
@@ -119,14 +120,9 @@ public class MainGUI extends JFrame {
         };
     }
 
-    //check this
-    public static SessionList addToFront(SessionList s1, Session front){
-        return switch(s1){
-            case null -> new SessionList(front, null);
-            case SessionList(Session f, SessionList r) ->
-                    new SessionList(front, addToFront(r, f));
 
-        };
+    public static SessionList addToFront(SessionList s1, Session front){
+        return  new SessionList(front, s1);
     }
 
 
@@ -160,7 +156,7 @@ public class MainGUI extends JFrame {
 
             Session s1 = new Session(id, title, mentor, date, location, maxParticipants);
             //need to add in correct spot
-            SessionList correct = addInOrder(s1, sessions);
+            sessions = addInOrder(s1, sessions);
 
             outputArea.setText("Session Added Successfully\n");
             // Clear the input fields
