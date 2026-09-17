@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+
+
 public class MainGUI extends JFrame {
     private JTextField idField;
     private JTextField titleField;
@@ -81,7 +83,7 @@ public class MainGUI extends JFrame {
 
         // Button Actions
         addButton.addActionListener(e -> addSession());
-        displayButton.addActionListener(e -> displaySessions());
+        displayButton.addActionListener(e -> displaySessions(sessions));
         searchButton.addActionListener(e -> searchSession());
         removeButton.addActionListener(e -> removeSession());
         registerButton.addActionListener(e -> registerParticipant());
@@ -156,20 +158,40 @@ public class MainGUI extends JFrame {
 
             Session s1 = new Session(id, title, mentor, date, location, maxParticipants);
             //need to add in correct spot
-            sessions = addInOrder(s1, sessions);
-
-            outputArea.setText("Session Added Successfully\n");
-            // Clear the input fields
-            clearFields();
+            if(searchByID(sessions, s1.id)!=null){
+                outputArea.setText("Duplicate id");
+            }
+            else{
+                sessions = addInOrder(s1, sessions);
+                outputArea.setText("Session Added Successfully\n");
+                // Clear the input fields
+                clearFields();
+            }
         }
         catch(Exception e) {
             outputArea.setText("Invalid input");
         }
     }
 
+    public static void showSessions(SessionList s1, JTextArea outputArea){
+        switch (s1) {
+            case null -> { outputArea.append(""); }
+            case SessionList(Session f, SessionList r) ->
+            {
+                //automatically casts f.id to string
+                outputArea.append("ID = " + f.id + " Title = " + f.title + " Mentor = " +
+                        f.mentor + " Date = " + f.date + " Location = " + f.location
+                        + " Max Participants = " +  f.maxNum + "\n--------------------\n");
+                showSessions(r, outputArea);
+            }
+        }
+    }
+
     // display all sessions in the output area
-    private void displaySessions() {
+    private void displaySessions(SessionList s1) {
         outputArea.setText("");
+        //sessions.forEach((n) -> {outputArea.append(n+ "/n");});
+        showSessions(s1, outputArea);
 
         // iterate over sessions; display each one
         // to the output window, using the `append`
@@ -177,9 +199,33 @@ public class MainGUI extends JFrame {
 
         // between each one, print a separator line,
         // as e.g.
-
-        outputArea.append("\n--------------------\n");
     }
+
+
+    public static Session searchByID(SessionList s1, int id){
+        return switch(s1){
+            case null -> null;
+            case SessionList(Session f, SessionList r) -> {
+                if(f.id==id){
+                    yield new Session(f.id, f.title, f.mentor, f.date, f.location, f.maxNum);
+                } else{
+                    yield searchByID(r, id);
+                }}
+            };
+        }
+
+    public static SessionList searchByMentor(SessionList s1, String mentor){
+        return switch(s1){
+            case null -> null;
+            case SessionList(Session f, SessionList r) -> {
+                if(f.mentor.equals(mentor)){
+                    yield new SessionList(f, searchByMentor(r, mentor));
+                } else{
+                    yield searchByMentor(r, mentor);
+                }}
+        };
+    }
+
 
     // search by ID if presesnt, mentor otherwise, display results
     private void searchSession() {
@@ -187,12 +233,16 @@ public class MainGUI extends JFrame {
         if (!idField.getText().trim().isEmpty()) {
             int id = Integer.parseInt(idField.getText().trim());
             // find session by ID, using a `searchByID` method
-            // ... code here ...
-            /* if (result != null)
-                // display session to the output area...
-            else
-                outputArea.setText("Session not found.");
-             */
+            Session result = searchByID(sessions, id);
+             if (result != null) {
+                 // display session to the output area...
+                 outputArea.append("ID = " + result.id + " Title = " + result.title + " Mentor = " +
+                         result.mentor + " Date = " + result.date + " Location = " + result.location
+                         + " Max Participants = " + result.maxNum + "\n--------------------\n");
+             }
+            else {
+                 outputArea.setText("Session not found.");
+             }
         }
         // Otherwise, search by mentor if the Mentor field is not empty
         else if (!mentorField.getText().trim().isEmpty()) {
@@ -200,12 +250,14 @@ public class MainGUI extends JFrame {
             // find session by mentor. In this case, the result
             // may be a list of sessions...
             // ... code here ...
-            /*
-            if (result != null)
+            SessionList result = searchByMentor(sessions, mentor);
+            if (result != null) {
                 // display all sessions in the list
-            else
+                displaySessions(result);
+            }
+            else {
                 outputArea.setText("No session found for mentor: " + mentor);
-             */
+            }
         }
         // Nothing entered
         else {
@@ -213,11 +265,26 @@ public class MainGUI extends JFrame {
         }
     }
 
+    public static SessionList remove(SessionList s1, int id){
+        return switch(s1){
+            case null -> null;
+            case SessionList(Session f, SessionList r) -> {
+                if(f.id==id){
+                    yield new SessionList(null, r);
+                } else{
+                    yield new SessionList(f, r);
+                }}
+        };
+    }
+
     // given an id, remove that session from the list
     private void removeSession() {
         int id = Integer.parseInt(idField.getText());
         // remove the session, print an error to the outputArea
+        sessions = remove(sessions, id);
+        outputArea.setText("removed the session");
         // if it's not found
+
         // ... code here ...
     }
 

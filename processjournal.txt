@@ -9,3 +9,8 @@ Worked on the addInOrder to try to put the session in order by date, creating ne
 Session 3
 9/16/2026 at 6:45 pm to 7 pm
 Finished the addInOrder, fixed the addToFront function and empty sessionList representation
+
+Session 4
+9/17/2026 at 10:30 am to 11:34 am
+Finished displaySessions and searchSessions, needed to create new searchbyID and searchBymentor functions
+Also modified the display by adding in a list as a parameter
