@@ -119,16 +119,26 @@ public class MainGUI extends JFrame {
         };
     }
 
+    //check this
+    public static SessionList addToFront(SessionList s1, Session front){
+        return switch(s1){
+            case null -> new SessionList(front, null);
+            case SessionList(Session f, SessionList r) ->
+                    new SessionList(front, addToFront(r, f));
+
+        };
+    }
+
+
     //need to figure out how to create new list
     public static SessionList addInOrder(Session s, SessionList s1){
         return switch(s1){
             case null -> addToEnd(s1, s);
             case SessionList(Session f, SessionList r) -> {
                 if(comesBefore(s1.first.date, s.date)){
-                    new SessionList(s1.first, addInOrder(s, s1.rest));
-                }
-                else{
-                    addToFront();
+                    yield new SessionList(s1.first, addInOrder(s, s1.rest));
+                } else{
+                    yield addToFront(s1, s);
                 }}
         };
     }
@@ -150,8 +160,7 @@ public class MainGUI extends JFrame {
 
             Session s1 = new Session(id, title, mentor, date, location, maxParticipants);
             //need to add in correct spot
-            addInOrder(s1, sessions);
-
+            SessionList correct = addInOrder(s1, sessions);
 
             outputArea.setText("Session Added Successfully\n");
             // Clear the input fields
