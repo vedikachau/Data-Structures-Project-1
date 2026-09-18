@@ -18,7 +18,7 @@ public class MainGUI extends JFrame {
     record Session(int id, String title, String mentor, String date, String location, int maxNum, int curNum) {};
     record SessionList(Session first, SessionList rest) {};
     //SessionList sessions = new SessionList(null, null);
-    private SessionList sessions;
+    public SessionList sessions;
 
     // the constructor for the class. This will initialize
     // the class's member variables:
