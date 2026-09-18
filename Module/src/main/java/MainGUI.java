@@ -13,6 +13,7 @@ public class MainGUI extends JFrame {
     private JTextField curField;
     private JTextArea outputArea;
 
+    //WE ASSUMED THAT DATE FOLLOWS THE FORMAT AND DIDN'T CHECK FOR IT
     // there should be a private member variable named `sessions` :
     record Session(int id, String title, String mentor, String date, String location, int maxNum, int curNum) {};
     record SessionList(Session first, SessionList rest) {};
@@ -282,16 +283,7 @@ public class MainGUI extends JFrame {
     }
 
     //this removes a session by its id in a list of session
-    /*public static void remove(int id, SessionList sess){
-        while(sess.first !=null){
-            if(sess.first.id == id){
-                sess.first = null; // note to self: make this remove not null
-            }
-            else{
-                remove(id, sess.rest);
-            }
-        }
-    }*/
+
     // given an id, remove that session from the list
     private void removeSession() {
         int id = Integer.parseInt(idField.getText());
@@ -324,26 +316,7 @@ public class MainGUI extends JFrame {
             }
         };
     }
-        /*if(s1.first!=null) {
-            if (s1.first.id != id) {
-                return register(s1.rest, id, outputArea);
-            }
-            else{
-                int num = s1.first.curNum;
-                if(num < s1.first.maxNum){
-                    outputArea.setText("Success");
-                    return new Session(s1.first.id, s1.first.title, s1.first.mentor, s1.first.date, s1.first.location, s1.first.maxNum, num);
-                }
-                else{
-                    outputArea.setText("Session Full");
-                    return null;
-                }
-            }
-        }
-        else{
-            outputArea.setText("Invalid");
-            return null;
-        }*/
+
 
 
     // add one to the count of the specified session.
