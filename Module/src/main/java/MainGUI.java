@@ -12,8 +12,11 @@ public class MainGUI extends JFrame {
     private JTextArea outputArea;
 
     // there should be a private member variable named `sessions` :
-    record Session(int id, String title, String mentor, String date, String location, int maxNum) {};
+    record Session(int id, String title, String mentor, String date, String location, int maxNum, int curNum) {};
     // private SomethingOrOther sessions;
+    //this makes a list of session
+    record SessionList(Session first, SessionList rest) {};
+
 
     // the constructor for the class. This will initialize
     // the class's member variables:
@@ -31,14 +34,7 @@ public class MainGUI extends JFrame {
         setVisible(true);
     }
 
-    public static SessionList addToEnd(SessionList d, dateRecord end){
-        return switch(d){
-            case null -> new Date(end, null);
-            case Date(dateRecord f, Date r) ->
-                    new Date(f, addToEnd(r, end));
 
-        };
-    }
 
     // Create all of the display elements in the frame:
     private void createGUI() {
@@ -133,8 +129,9 @@ public class MainGUI extends JFrame {
             // the list of sessions
             //record SessionList(Session first, SessionList rest) {};
 
-            Session s1 = new Session(id, title, mentor, date, location, maxParticipants);
+            Session s1 = new Session(id, title, mentor, date, location, maxParticipants,0);
             //need to add in correct spot
+            
 
 
             outputArea.setText("Session Added Successfully\n");
@@ -207,6 +204,33 @@ public class MainGUI extends JFrame {
         // increment participants field of session,
         // print success or failure message.
     }
+
+    //this removes a session by its id in a list of session
+    public static void removeSession(int id, SessionList sess){
+        while( sess.first !=null){
+            if(sess.first.id == id){
+                sess.first = null; // note to self: make this remove not null
+            }
+            else{
+                removeSession(id, sess.rest);
+            }
+        }
+    }
+
+    // This will register more participants in session id unless full
+    public static void register( int id,SessionList sess){
+        if(sess.first!=null) {
+            if (sess.first.id != id) {
+                register(id, sess.rest);
+            }
+            else{
+                if( sess.first.curNum < sess.first.maxNum){
+                    sess.first.curNum = sess.first.curNum +1; // fix whateva happening here ig
+                }
+            }
+        }
+    }
+
 
     public static void main(String[] args) {
         new MainGUI();
