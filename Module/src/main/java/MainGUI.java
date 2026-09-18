@@ -10,11 +10,11 @@ public class MainGUI extends JFrame {
     private JTextField dateField;
     private JTextField locationField;
     private JTextField maxField;
-
+    private JTextField curField;
     private JTextArea outputArea;
 
     // there should be a private member variable named `sessions` :
-    record Session(int id, String title, String mentor, String date, String location, int maxNum) {};
+    record Session(int id, String title, String mentor, String date, String location, int maxNum, int curNum) {};
     record SessionList(Session first, SessionList rest) {};
     //SessionList sessions = new SessionList(null, null);
     private SessionList sessions;
@@ -47,6 +47,7 @@ public class MainGUI extends JFrame {
         dateField = new JTextField();
         locationField = new JTextField();
         maxField = new JTextField();
+        curField = new JTextField();
         inputPanel.add(new JLabel("Session ID"));
         inputPanel.add(idField);
         inputPanel.add(new JLabel("Title"));
@@ -59,6 +60,8 @@ public class MainGUI extends JFrame {
         inputPanel.add(locationField);
         inputPanel.add(new JLabel("Max Participants"));
         inputPanel.add(maxField);
+        inputPanel.add(new JLabel("Current Participants"));
+        inputPanel.add(curField);
         add(inputPanel, BorderLayout.NORTH);
 
         // next, the lower half of the window contains an output area
@@ -98,7 +101,7 @@ public class MainGUI extends JFrame {
         dateField.setText("");
         locationField.setText("");
         maxField.setText("");
-        // Put the cursor back in the first field
+        curField.setText("");        // Put the cursor back in the first field
         idField.requestFocus();
     }
 
@@ -151,12 +154,13 @@ public class MainGUI extends JFrame {
             String date = dateField.getText();
             String location = locationField.getText();
             int maxParticipants = Integer.parseInt(maxField.getText());
+            int curNum = Integer.parseInt(curField.getText());
 
             // TO DO: construct a session object, insert it into
             // the list of sessions
             //record SessionList(Session first, SessionList rest) {};
 
-            Session s1 = new Session(id, title, mentor, date, location, maxParticipants);
+            Session s1 = new Session(id, title, mentor, date, location, maxParticipants, curNum);
             //need to add in correct spot
             if(searchByID(sessions, s1.id)!=null){
                 outputArea.setText("Duplicate id");
@@ -175,13 +179,13 @@ public class MainGUI extends JFrame {
 
     public static void showSessions(SessionList s1, JTextArea outputArea){
         switch (s1) {
-            case null -> { outputArea.append(""); }
+            case null ->  outputArea.append("");
             case SessionList(Session f, SessionList r) ->
             {
                 //automatically casts f.id to string
                 outputArea.append("ID = " + f.id + " Title = " + f.title + " Mentor = " +
                         f.mentor + " Date = " + f.date + " Location = " + f.location
-                        + " Max Participants = " +  f.maxNum + "\n--------------------\n");
+                        + " Max Participants = " +  f.maxNum + " Current Num = " + f.curNum + "\n--------------------\n");
                 showSessions(r, outputArea);
             }
         }
@@ -207,7 +211,7 @@ public class MainGUI extends JFrame {
             case null -> null;
             case SessionList(Session f, SessionList r) -> {
                 if(f.id==id){
-                    yield new Session(f.id, f.title, f.mentor, f.date, f.location, f.maxNum);
+                    yield new Session(f.id, f.title, f.mentor, f.date, f.location, f.maxNum, f.curNum);
                 } else{
                     yield searchByID(r, id);
                 }}
@@ -238,7 +242,7 @@ public class MainGUI extends JFrame {
                  // display session to the output area...
                  outputArea.append("ID = " + result.id + " Title = " + result.title + " Mentor = " +
                          result.mentor + " Date = " + result.date + " Location = " + result.location
-                         + " Max Participants = " + result.maxNum + "\n--------------------\n");
+                         + " Max Participants = " + result.maxNum + " Current Num = " + result.curNum + "\n--------------------\n");
              }
             else {
                  outputArea.setText("Session not found.");
@@ -277,24 +281,91 @@ public class MainGUI extends JFrame {
         };
     }
 
+    //this removes a session by its id in a list of session
+    /*public static void remove(int id, SessionList sess){
+        while(sess.first !=null){
+            if(sess.first.id == id){
+                sess.first = null; // note to self: make this remove not null
+            }
+            else{
+                remove(id, sess.rest);
+            }
+        }
+    }*/
     // given an id, remove that session from the list
     private void removeSession() {
         int id = Integer.parseInt(idField.getText());
         // remove the session, print an error to the outputArea
-        sessions = remove(sessions, id);
-        outputArea.setText("removed the session");
         // if it's not found
-
+        if(searchByID(sessions, id)==null){
+            outputArea.setText("No session with that id");
+        }
+        else{
+            sessions = remove(sessions, id);
+            outputArea.setText("removed the session");
+        }
         // ... code here ...
     }
+
+    public static SessionList register(SessionList s1, int id) {
+        return switch (s1) {
+            case null -> null;
+            case SessionList(Session f, SessionList r) -> {
+                if (f.id != id) {
+                    yield new SessionList(f, register(r, id));
+                } else if (f.curNum < f.maxNum) {
+                    Session updated = new Session(f.id, f.title, f.mentor, f.date,
+                            f.location, f.maxNum, f.curNum + 1);
+                    yield new SessionList(updated, r);
+                } else {
+                    yield new SessionList(f, r);
+                }
+
+            }
+        };
+    }
+        /*if(s1.first!=null) {
+            if (s1.first.id != id) {
+                return register(s1.rest, id, outputArea);
+            }
+            else{
+                int num = s1.first.curNum;
+                if(num < s1.first.maxNum){
+                    outputArea.setText("Success");
+                    return new Session(s1.first.id, s1.first.title, s1.first.mentor, s1.first.date, s1.first.location, s1.first.maxNum, num);
+                }
+                else{
+                    outputArea.setText("Session Full");
+                    return null;
+                }
+            }
+        }
+        else{
+            outputArea.setText("Invalid");
+            return null;
+        }*/
+
 
     // add one to the count of the specified session.
     // MUTATES participant count of session.
     private void registerParticipant() {
         int id = Integer.parseInt(idField.getText());
+        if(searchByID(sessions, id)==null){
+            outputArea.setText("No session with that id");
+        }
+        else if(searchByID(sessions, id).curNum >= searchByID(sessions, id).maxNum){
+            outputArea.setText("fail, class full");
+        }
+        else{
+            outputArea.setText("success");
+            sessions = register(sessions, id);
+        }
+
         // increment participants field of session,
         // print success or failure message.
     }
+
+
 
     public static void main(String[] args) {
         new MainGUI();
